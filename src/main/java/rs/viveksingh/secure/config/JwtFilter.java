@@ -31,6 +31,9 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     //it extracts, validates, and processes the JWT token.
+    //HttpServletRequest request have response that we got from the user it also contains the authorization header
+    //HttpServletResponse response , represents the response sent back to the client
+    //FilterChain filterChain ,calls the next filter in the Spring Security filter chain or forwards the request to the controller
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
          //we get token in the form of (Bearer tokenvalue) from the user we have to cut the bearer part

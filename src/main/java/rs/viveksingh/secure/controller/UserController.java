@@ -15,6 +15,9 @@ public class UserController {
 
     UserService userService;
 
+// Using constructor injection as it ensures dependencies are provided at object creation
+//Makes the class easier to test (supports dependency injection without using Spring).\
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -34,7 +37,8 @@ public class UserController {
 //    public List<User> getAllUsers() {
 //        return userService.findAll();
 //    }
-    
+     //response entity is basically used to return the HTTP responses
+    //@RequestBody extracts the user object from the request json body
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user){
         userService.saveUser(user);

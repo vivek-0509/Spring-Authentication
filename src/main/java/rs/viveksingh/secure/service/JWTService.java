@@ -93,6 +93,7 @@ JWTService {
         return extractExpiration(token).before(new Date());
     }
 
+    // Claims::getExpiration  ,is  a method reference that refers to the getExpiration() method inside the claims intreface
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }

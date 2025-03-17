@@ -44,28 +44,32 @@ public class SecuirtyConfig {
                         .anyRequest().authenticated()
                 ).httpBasic(Customizer.withDefaults()) //for basic auth username pass
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);//this is done because i basically want that my user should be first verified through jwt token then it should go user pass verification
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);//this is done because i basically want that my user should be first verified through jwt token then it should go user password verification
+       // This ensures that Spring Security does not prompt for username/password authentication if JWT authentication is successful.
         return http.build();
      }
      //Dao is basically a database authenticate provider
      //DaoAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider which implements Authentication provider
+    //DaoAuthenticationProvider is a Spring Security class that retrieves user details from a database using UserDetailsService
      @Bean
      public AuthenticationProvider authenticationProvider() {
          DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-         provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
-         provider.setUserDetailsService(userDetailsService);
-         return provider;
+         provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); //sets password encoder to Bcrypt ,it hashes password securely
+         provider.setUserDetailsService(userDetailsService); //injects UserDetailsService to load user details from the databases
+         return provider; //returning DaoAuthenticationProvider instance which spring security uses to authenticate  users
      }
       //Authentication manager returns  authentication object if user is authenticated
      //Authentication manager is a interface
     //AuthenticationConfiguration has a method that provide AuthenticationManager
     //AuthenticationConfiguration is an auto-configured Spring class that provides an AuthenticationManager instance.
     //This method retrieves the default AuthenticationManager from Spring Security.
+    //AuthenticationConfiguration is a built-in Spring Security class that provides access to the default authentication setup.
      @Bean
      public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-         return config.getAuthenticationManager();
+         return config.getAuthenticationManager(); //Returns the default AuthenticationManager, ensuring authentication uses the correct provider
      }
-
+     // Spring Security does not automatically expose AuthenticationManager as a Bean
+    //We define it manually so that it can be injected and used anywhere in the application
 
   /*   not actually connecting with database just checking the in memory saved user
     @Bean
