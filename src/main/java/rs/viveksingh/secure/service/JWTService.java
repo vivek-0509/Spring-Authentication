@@ -31,7 +31,7 @@ JWTService {
         try{
             KeyGenerator keyGen= KeyGenerator.getInstance("HmacSHA256");//we are using HmacSHA256 algorithm to generate a key
             SecretKey sk= keyGen.generateKey();
-            secretkey= Base64.getEncoder().encodeToString(sk.getEncoded()); //it converts the key into string form
+            secretkey= Base64.getEncoder().encodeToString(sk.getEncoded()); //it converts the key into a Base64-encoded string form for storage
         }catch(NoSuchAlgorithmException e){
            throw new RuntimeException(e);
         }
@@ -46,8 +46,8 @@ JWTService {
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(username)   //all this things mentioned below  are to be claimed  in our token
-                .issuedAt(new Date(System.currentTimeMillis()))
+                .subject(username)   //all this things mentioned below  are to be claimed  in our token ,.adding  user name as claim
+                .issuedAt(new Date(System.currentTimeMillis()))//set issue time
                 .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
                 .and()
                 .signWith(getKey()) //here we are signing and for signing we need key so we are generating the key
@@ -64,12 +64,16 @@ JWTService {
     //claims is basically a minterface that implements Map through which we can extract the claims that we saved in our map
 
     public String extractUserName(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, Claims::getSubject); //extracting the username stored inside jwt
     }
 
+    //using java functional programming to dynamically retrive claims
+    //Reusable method to extract any claim
+    //T can be any data type basically a generic type
+    //it takes clames as input and retuns a specific claim
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims =extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        final Claims claims =extractAllClaims(token); //now claim holds all the data inside the Jwt
+        return claimsResolver.apply(claims); //we apply claim resolver function to extract one specific claim
     }
 
     private Claims extractAllClaims(String token) {
@@ -79,6 +83,7 @@ JWTService {
                 .getPayload();
     }
 
+    //matching the userdetails from the database
     public boolean validateToken(String token, UserDetails userDetails) {
         final String userName=extractUserName(token);
         return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
